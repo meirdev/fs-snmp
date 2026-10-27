@@ -1,0 +1,43 @@
+# fs-snmp configuration
+#
+# oids_file: JSON file with the OID groups (see snmp.json).
+# output:    where samples go: stdout (text/json) or an HTTP ingest server.
+# defaults:  applied to every device unless the device overrides the field.
+# groups:    group name from snmp.json -> polling interval (0 disables).
+#            Available groups: system, information, counters, lldp, vendor_specific.
+#            vendor_specific picks objects matching the device "vendor" field.
+# ${VAR} anywhere in this file is replaced from the environment.
+
+oids_file: snmp.json
+
+output:
+  type: http                                  # stdout | http
+  format: text                                # stdout only: text | json
+  url: http://127.0.0.1:8081/api/v1/samples   # http only
+  token: ${INGEST_TOKEN}                      # sent as "Authorization: Bearer ..."
+  batch_size: 1000                            # samples per POST
+  flush_interval: 5s                          # send partial batches at least this often
+  timeout: 10s
+  gzip: true
+
+defaults:
+  port: 161
+  version: 2c          # 1 or 2c
+  timeout: 5s
+  retries: 1
+  groups:
+    system: 5m
+    information: 5m
+    counters: 30s
+    lldp: 10m
+    vendor_specific: 1m
+
+devices:
+  - name: juniper-lab
+    host: 172.20.1.150
+    port: 161
+    community: FlowSec_Community
+    vendor: Juniper
+    groups:
+      # counters: 30s      # overrides the default
+      vendor_specific: 1m

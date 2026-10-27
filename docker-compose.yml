@@ -1,0 +1,79 @@
+# Development stack: ClickHouse + ingest server + Grafana.
+# The poller normally runs on a remote host; `--profile poller` also runs it here.
+#
+#   docker compose up -d --build          # clickhouse, ingest, grafana
+#   docker compose --profile poller up -d # ...plus the poller (needs SNMP reachability)
+#
+# Grafana: http://localhost:3001  (anonymous admin, dev only)
+# Ingest:  http://localhost:8081/api/v1/samples   token: ${INGEST_TOKEN:-dev-token}
+
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.8
+    environment:
+      CLICKHOUSE_USER: snmp
+      CLICKHOUSE_PASSWORD: snmp
+      CLICKHOUSE_DB: snmp
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - ./clickhouse/init:/docker-entrypoint-initdb.d:ro
+      - clickhouse-data:/var/lib/clickhouse
+    ports:
+      - "127.0.0.1:8123:8123"   # HTTP
+      - "127.0.0.1:9000:9000"   # native
+    ulimits:
+      nofile: { soft: 262144, hard: 262144 }
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  ingest:
+    build: ./ingest
+    environment:
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: 8123
+      CLICKHOUSE_USER: snmp
+      CLICKHOUSE_PASSWORD: snmp
+      CLICKHOUSE_DB: snmp
+      INGEST_TOKEN: ${INGEST_TOKEN:-dev-token}
+    ports:
+      - "8081:8080"
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:12.1.1
+    environment:
+      GF_INSTALL_PLUGINS: grafana-clickhouse-datasource
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_BASIC_ENABLED: "false"
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "127.0.0.1:3001:3000"
+    depends_on:
+      - clickhouse
+
+  poller:
+    build: .
+    profiles: ["poller"]
+    volumes:
+      - ./config.docker.yaml:/app/config.yaml:ro
+      - ./snmp.json:/app/snmp.json:ro
+    environment:
+      INGEST_TOKEN: ${INGEST_TOKEN:-dev-token}
+    depends_on:
+      - ingest
+    restart: unless-stopped
+
+volumes:
+  clickhouse-data:
+  grafana-data:

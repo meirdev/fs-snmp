@@ -1,0 +1,316 @@
+{
+  "uid": "fs-snmp-device",
+  "title": "SNMP Device Overview",
+  "tags": ["fs-snmp"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "device",
+        "label": "Device",
+        "type": "query",
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+        "query": "SELECT DISTINCT device FROM snmp.metrics ORDER BY device",
+        "refresh": 1,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "table",
+      "title": "Details",
+      "gridPos": { "h": 10, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "showHeader": false, "cellHeight": "sm" },
+      "fieldConfig": { "defaults": {}, "overrides": [ { "matcher": { "id": "byName", "options": "item" }, "properties": [ { "id": "custom.width", "value": 110 } ] } ] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "table", "format": 0,
+          "rawSql": "SELECT metric AS item, argMax(value, ts) AS value FROM snmp.info WHERE device = '${device}' AND grp = 'system' GROUP BY metric ORDER BY metric"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Status",
+      "gridPos": { "h": 4, "w": 3, "x": 6, "y": 0 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "colorMode": "background", "graphMode": "none", "textMode": "value" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "mappings": [
+            { "type": "range", "options": { "from": 0, "to": 180, "result": { "text": "Up", "color": "green" } } },
+            { "type": "range", "options": { "from": 180, "to": 1e12, "result": { "text": "Stale", "color": "red" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null } ] }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "table", "format": 0,
+          "rawSql": "SELECT dateDiff('second', max(ts), now()) AS last_seen FROM snmp.metrics WHERE device = '${device}' AND metric = 'sysUpTime'"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Uptime",
+      "gridPos": { "h": 4, "w": 4, "x": 9, "y": 0 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "colorMode": "none", "graphMode": "none" },
+      "fieldConfig": { "defaults": { "unit": "dtdurations", "decimals": 1 }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "table", "format": 0,
+          "rawSql": "SELECT argMax(value, ts) / 100 AS uptime FROM snmp.metrics WHERE device = '${device}' AND metric = 'sysUpTime'"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "CPU (Routing Engine)",
+      "gridPos": { "h": 4, "w": 3, "x": 13, "y": 0 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "colorMode": "value", "graphMode": "area" },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 70 }, { "color": "red", "value": 90 } ] } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "timeseries", "format": 1,
+          "rawSql": "SELECT ts AS time, value AS cpu FROM snmp.metrics WHERE device = '${device}' AND metric = 'jnxOperatingCPU' AND idx IN (SELECT idx FROM snmp.info WHERE device = '${device}' AND metric = 'jnxOperatingDescr' AND value LIKE 'Routing Engine%') AND $__timeFilter(ts) ORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Memory (Routing Engine)",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "colorMode": "value", "graphMode": "area" },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 80 }, { "color": "red", "value": 95 } ] } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "timeseries", "format": 1,
+          "rawSql": "SELECT ts AS time, value AS memory FROM snmp.metrics WHERE device = '${device}' AND metric = 'jnxOperatingBuffer' AND idx IN (SELECT idx FROM snmp.info WHERE device = '${device}' AND metric = 'jnxOperatingDescr' AND value LIKE 'Routing Engine%') AND $__timeFilter(ts) ORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Temperature (Routing Engine)",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 0 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "colorMode": "value", "graphMode": "area" },
+      "fieldConfig": { "defaults": { "unit": "celsius", "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 60 }, { "color": "red", "value": 75 } ] } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "timeseries", "format": 1,
+          "rawSql": "SELECT ts AS time, value AS temperature FROM snmp.metrics WHERE device = '${device}' AND metric = 'jnxOperatingTemp' AND idx IN (SELECT idx FROM snmp.info WHERE device = '${device}' AND metric = 'jnxOperatingDescr' AND value LIKE 'Routing Engine%') AND $__timeFilter(ts) ORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Inbound traffic",
+      "gridPos": { "h": 6, "w": 9, "x": 6, "y": 4 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["lastNotNull"], "sortBy": "Last *", "sortDesc": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "bps", "min": 0, "custom": { "lineWidth": 1, "fillOpacity": 5, "spanNulls": true } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "timeseries", "format": 1,
+          "rawSql": "SELECT r.ts AS time, coalesce(n.name, r.idx) AS interface, (r.value - r.prev) * 8 / ((r.ts_ms - r.prev_ms) / 1000) AS bps FROM (SELECT idx, ts, value, toUnixTimestamp64Milli(ts) AS ts_ms, lagInFrame(value) OVER w AS prev, lagInFrame(toUnixTimestamp64Milli(ts)) OVER w AS prev_ms, row_number() OVER w AS rn FROM snmp.metrics WHERE device = '${device}' AND metric = 'ifHCInOctets' AND $__timeFilter(ts) WINDOW w AS (PARTITION BY idx ORDER BY ts)) AS r LEFT JOIN (SELECT idx, argMax(value, ts) AS name FROM snmp.info WHERE device = '${device}' AND metric = 'ifDescr' GROUP BY idx) AS n ON n.idx = r.idx WHERE r.rn > 1 AND r.value >= r.prev AND r.ts_ms > r.prev_ms ORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Outbound traffic",
+      "gridPos": { "h": 6, "w": 9, "x": 15, "y": 4 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["lastNotNull"], "sortBy": "Last *", "sortDesc": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "bps", "min": 0, "custom": { "lineWidth": 1, "fillOpacity": 5, "spanNulls": true } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "timeseries", "format": 1,
+          "rawSql": "SELECT r.ts AS time, coalesce(n.name, r.idx) AS interface, (r.value - r.prev) * 8 / ((r.ts_ms - r.prev_ms) / 1000) AS bps FROM (SELECT idx, ts, value, toUnixTimestamp64Milli(ts) AS ts_ms, lagInFrame(value) OVER w AS prev, lagInFrame(toUnixTimestamp64Milli(ts)) OVER w AS prev_ms, row_number() OVER w AS rn FROM snmp.metrics WHERE device = '${device}' AND metric = 'ifHCOutOctets' AND $__timeFilter(ts) WINDOW w AS (PARTITION BY idx ORDER BY ts)) AS r LEFT JOIN (SELECT idx, argMax(value, ts) AS name FROM snmp.info WHERE device = '${device}' AND metric = 'ifDescr' GROUP BY idx) AS n ON n.idx = r.idx WHERE r.rn > 1 AND r.value >= r.prev AND r.ts_ms > r.prev_ms ORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Highest inbound utilization (interfaces with a known speed)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["lastNotNull"], "sortBy": "Last *", "sortDesc": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "custom": { "lineWidth": 1, "fillOpacity": 5, "spanNulls": true } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "timeseries", "format": 1,
+          "rawSql": "SELECT r.ts AS time, coalesce(n.name, r.idx) AS interface, (r.value - r.prev) * 8 / ((r.ts_ms - r.prev_ms) / 1000) / (s.speed * 1000000) * 100 AS utilization FROM (SELECT idx, ts, value, toUnixTimestamp64Milli(ts) AS ts_ms, lagInFrame(value) OVER w AS prev, lagInFrame(toUnixTimestamp64Milli(ts)) OVER w AS prev_ms, row_number() OVER w AS rn FROM snmp.metrics WHERE device = '${device}' AND metric = 'ifHCInOctets' AND $__timeFilter(ts) WINDOW w AS (PARTITION BY idx ORDER BY ts)) AS r INNER JOIN (SELECT idx, argMax(value, ts) AS speed FROM snmp.metrics WHERE device = '${device}' AND metric = 'ifHighSpeed' GROUP BY idx HAVING speed > 0) AS s ON s.idx = r.idx LEFT JOIN (SELECT idx, argMax(value, ts) AS name FROM snmp.info WHERE device = '${device}' AND metric = 'ifDescr' GROUP BY idx) AS n ON n.idx = r.idx WHERE r.rn > 1 AND r.value >= r.prev AND r.ts_ms > r.prev_ms ORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Highest outbound utilization (interfaces with a known speed)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["lastNotNull"], "sortBy": "Last *", "sortDesc": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "custom": { "lineWidth": 1, "fillOpacity": 5, "spanNulls": true } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "timeseries", "format": 1,
+          "rawSql": "SELECT r.ts AS time, coalesce(n.name, r.idx) AS interface, (r.value - r.prev) * 8 / ((r.ts_ms - r.prev_ms) / 1000) / (s.speed * 1000000) * 100 AS utilization FROM (SELECT idx, ts, value, toUnixTimestamp64Milli(ts) AS ts_ms, lagInFrame(value) OVER w AS prev, lagInFrame(toUnixTimestamp64Milli(ts)) OVER w AS prev_ms, row_number() OVER w AS rn FROM snmp.metrics WHERE device = '${device}' AND metric = 'ifHCOutOctets' AND $__timeFilter(ts) WINDOW w AS (PARTITION BY idx ORDER BY ts)) AS r INNER JOIN (SELECT idx, argMax(value, ts) AS speed FROM snmp.metrics WHERE device = '${device}' AND metric = 'ifHighSpeed' GROUP BY idx HAVING speed > 0) AS s ON s.idx = r.idx LEFT JOIN (SELECT idx, argMax(value, ts) AS name FROM snmp.info WHERE device = '${device}' AND metric = 'ifDescr' GROUP BY idx) AS n ON n.idx = r.idx WHERE r.rn > 1 AND r.value >= r.prev AND r.ts_ms > r.prev_ms ORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "CPU by component",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 18 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "custom": { "lineWidth": 1, "fillOpacity": 10 } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "timeseries", "format": 1,
+          "rawSql": "SELECT m.ts AS time, d.name AS component, m.value AS cpu FROM snmp.metrics AS m INNER JOIN (SELECT idx, argMax(value, ts) AS name FROM snmp.info WHERE device = '${device}' AND metric = 'jnxOperatingDescr' GROUP BY idx) AS d ON d.idx = m.idx WHERE m.device = '${device}' AND m.metric = 'jnxOperatingCPU' AND $__timeFilter(m.ts) ORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Memory by component",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 18 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "custom": { "lineWidth": 1, "fillOpacity": 10 } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "timeseries", "format": 1,
+          "rawSql": "SELECT m.ts AS time, d.name AS component, m.value AS memory FROM snmp.metrics AS m INNER JOIN (SELECT idx, argMax(value, ts) AS name FROM snmp.info WHERE device = '${device}' AND metric = 'jnxOperatingDescr' GROUP BY idx) AS d ON d.idx = m.idx WHERE m.device = '${device}' AND m.metric = 'jnxOperatingBuffer' AND $__timeFilter(m.ts) ORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Temperature by component",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 18 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "celsius", "min": 0, "custom": { "lineWidth": 1, "fillOpacity": 10 } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "timeseries", "format": 1,
+          "rawSql": "SELECT m.ts AS time, d.name AS component, m.value AS temperature FROM snmp.metrics AS m INNER JOIN (SELECT idx, argMax(value, ts) AS name FROM snmp.info WHERE device = '${device}' AND metric = 'jnxOperatingDescr' GROUP BY idx) AS d ON d.idx = m.idx WHERE m.device = '${device}' AND m.metric = 'jnxOperatingTemp' AND $__timeFilter(m.ts) ORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "type": "table",
+      "title": "Interfaces",
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 26 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "showHeader": true, "cellHeight": "sm", "sortBy": [ { "displayName": "ifIndex", "desc": false } ] },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "oper" }, "properties": [ { "id": "custom.cellOptions", "value": { "type": "color-text" } }, { "id": "mappings", "value": [ { "type": "value", "options": { "up": { "text": "up", "color": "green" }, "down": { "text": "down", "color": "red" } } } ] } ] },
+          { "matcher": { "id": "byName", "options": "speed_mbps" }, "properties": [ { "id": "unit", "value": "Mbits" } ] }
+        ]
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "table", "format": 0,
+          "rawSql": "SELECT toUInt32OrZero(i.idx) AS ifIndex, i.name, i.alias, m.admin, m.oper, m.speed_mbps, m.mtu, i.mac FROM (SELECT idx, anyIf(v, metric = 'ifDescr') AS name, anyIf(v, metric = 'ifAlias') AS alias, anyIf(v, metric = 'ifPhysAddress') AS mac FROM (SELECT idx, metric, argMax(value, ts) AS v FROM snmp.info WHERE device = '${device}' AND metric IN ('ifDescr', 'ifAlias', 'ifPhysAddress') GROUP BY idx, metric) GROUP BY idx) AS i LEFT JOIN (SELECT idx, multiIf(anyIf(v, metric = 'ifOperStatus') = 1, 'up', anyIf(v, metric = 'ifOperStatus') = 2, 'down', 'other') AS oper, if(anyIf(v, metric = 'ifAdminStatus') = 1, 'up', 'down') AS admin, anyIf(v, metric = 'ifHighSpeed') AS speed_mbps, anyIf(v, metric = 'ifMtu') AS mtu FROM (SELECT idx, metric, argMax(value, ts) AS v FROM snmp.metrics WHERE device = '${device}' AND metric IN ('ifOperStatus', 'ifAdminStatus', 'ifHighSpeed', 'ifMtu') GROUP BY idx, metric) GROUP BY idx) AS m ON m.idx = i.idx ORDER BY ifIndex"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "type": "table",
+      "title": "LLDP neighbors",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 38 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "showHeader": true, "cellHeight": "sm" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "table", "format": 0,
+          "rawSql": "SELECT idx AS index, anyIf(v, metric = 'lldpRemSysName') AS neighbor, anyIf(v, metric = 'lldpRemPortId') AS port, anyIf(v, metric = 'lldpRemPortDesc') AS port_description FROM (SELECT idx, metric, argMax(value, ts) AS v FROM snmp.info WHERE device = '${device}' AND metric IN ('lldpRemSysName', 'lldpRemPortId', 'lldpRemPortDesc') GROUP BY idx, metric) GROUP BY idx ORDER BY idx"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Errors and discards (non-zero only)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 38 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["lastNotNull"], "sortBy": "Last *", "sortDesc": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "pps", "min": 0, "custom": { "lineWidth": 1, "fillOpacity": 5, "drawStyle": "points", "pointSize": 5 } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql", "queryType": "timeseries", "format": 1,
+          "rawSql": "SELECT r.ts AS time, concat(r.metric, ' ', coalesce(n.name, r.idx)) AS series, (r.value - r.prev) / ((r.ts_ms - r.prev_ms) / 1000) AS pps FROM (SELECT metric, idx, ts, value, toUnixTimestamp64Milli(ts) AS ts_ms, lagInFrame(value) OVER w AS prev, lagInFrame(toUnixTimestamp64Milli(ts)) OVER w AS prev_ms, row_number() OVER w AS rn FROM snmp.metrics WHERE device = '${device}' AND metric IN ('ifInErrors', 'ifOutErrors', 'ifInDiscards', 'ifOutDiscards') AND $__timeFilter(ts) WINDOW w AS (PARTITION BY metric, idx ORDER BY ts)) AS r LEFT JOIN (SELECT idx, argMax(value, ts) AS name FROM snmp.info WHERE device = '${device}' AND metric = 'ifDescr' GROUP BY idx) AS n ON n.idx = r.idx WHERE r.rn > 1 AND r.value > r.prev AND r.ts_ms > r.prev_ms ORDER BY time"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+# Config used by the optional "poller" compose profile: same as config.yaml
+# but the ingest server is reached by its compose service name.
+oids_file: snmp.json
+
+output:
+  type: http
+  url: http://ingest:8080/api/v1/samples
+  token: ${INGEST_TOKEN}
+  batch_size: 1000
+  flush_interval: 5s
+
+defaults:
+  version: 2c
+  timeout: 5s
+  retries: 1
+  groups:
+    system: 5m
+    information: 5m
+    counters: 30s
+    lldp: 10m
+    vendor_specific: 1m
+
+devices:
+  - name: juniper-lab
+    host: 172.20.1.150
+    community: FlowSec_Community
+    vendor: Juniper

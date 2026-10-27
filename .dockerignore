@@ -1,0 +1,6 @@
+fs-snmp
+.git
+grafana/
+clickhouse/
+ingest/
+*.md

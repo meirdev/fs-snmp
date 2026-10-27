@@ -1,0 +1,407 @@
+{
+  "counters": [
+    {
+      "name": "sysUpTime",
+      "oid": "1.3.6.1.2.1.1.3.0",
+      "data": "Network management uptime"
+    },
+    {
+      "name": "ifHCInOctets",
+      "oid": "1.3.6.1.2.1.31.1.1.1.6",
+      "data": "Inbound octets"
+    },
+    {
+      "name": "ifHCOutOctets",
+      "oid": "1.3.6.1.2.1.31.1.1.1.10",
+      "data": "Outbound octets"
+    },
+    {
+      "name": "ifHCInUcastPkts",
+      "oid": "1.3.6.1.2.1.31.1.1.1.7",
+      "data": "Inbound unicast packets"
+    },
+    {
+      "name": "ifHCOutUcastPkts",
+      "oid": "1.3.6.1.2.1.31.1.1.1.11",
+      "data": "Outbound unicast packets"
+    },
+    {
+      "name": "ifInErrors",
+      "oid": "1.3.6.1.2.1.2.2.1.14",
+      "data": "Inbound packet errors"
+    },
+    {
+      "name": "ifOutErrors",
+      "oid": "1.3.6.1.2.1.2.2.1.20",
+      "data": "Outbound packet errors"
+    },
+    {
+      "name": "ifInDiscards",
+      "oid": "1.3.6.1.2.1.2.2.1.13",
+      "data": "Inbound discarded packets"
+    },
+    {
+      "name": "ifOutDiscards",
+      "oid": "1.3.6.1.2.1.2.2.1.19",
+      "data": "Outbound discarded packets"
+    },
+    {
+      "name": "ifHCInMulticastPkts",
+      "oid": "1.3.6.1.2.1.31.1.1.1.8",
+      "data": "Inbound multicast packets"
+    },
+    {
+      "name": "ifHCOutMulticastPkts",
+      "oid": "1.3.6.1.2.1.31.1.1.1.12",
+      "data": "Outbound multicast packets"
+    },
+    {
+      "name": "ifHCInBroadcastPkts",
+      "oid": "1.3.6.1.2.1.31.1.1.1.9",
+      "data": "Inbound broadcast packets"
+    },
+    {
+      "name": "ifHCOutBroadcastPkts",
+      "oid": "1.3.6.1.2.1.31.1.1.1.13",
+      "data": "Outbound broadcast packets"
+    }
+  ],
+  "information": [
+    {
+      "name": "ifDescr",
+      "oid": "1.3.6.1.2.1.2.2.1.2",
+      "data": "Interface description"
+    },
+    {
+      "name": "ifAlias",
+      "oid": "1.3.6.1.2.1.31.1.1.1.18",
+      "data": "Administrator-assigned interface alias"
+    },
+    {
+      "name": "ifHighSpeed",
+      "oid": "1.3.6.1.2.1.31.1.1.1.15",
+      "data": "Interface capacity"
+    },
+    {
+      "name": "ifType",
+      "oid": "1.3.6.1.2.1.2.2.1.3",
+      "data": "Interface technology type"
+    },
+    {
+      "name": "ifMtu",
+      "oid": "1.3.6.1.2.1.2.2.1.4",
+      "data": "Interface MTU"
+    },
+    {
+      "name": "ifPhysAddress",
+      "oid": "1.3.6.1.2.1.2.2.1.6",
+      "data": "Interface physical address"
+    },
+    {
+      "name": "ifAdminStatus",
+      "oid": "1.3.6.1.2.1.2.2.1.7",
+      "data": "Interface administrative state"
+    },
+    {
+      "name": "ifOperStatus",
+      "oid": "1.3.6.1.2.1.2.2.1.8",
+      "data": "Interface operational state"
+    },
+    {
+      "name": "ifLastChange",
+      "oid": "1.3.6.1.2.1.2.2.1.9",
+      "data": "Uptime value at last interface state change"
+    },
+    {
+      "name": "ifStackStatus",
+      "oid": "1.3.6.1.2.1.31.1.2.1.3",
+      "data": "Interface sublayer relationship status"
+    },
+    {
+      "name": "ifConnectorPresent",
+      "oid": "1.3.6.1.2.1.31.1.1.1.17",
+      "data": "Physical connector presence"
+    },
+    {
+      "name": "ipAdEntIfIndex",
+      "oid": "1.3.6.1.2.1.4.20.1.2",
+      "data": "IPv4 address to interface index mapping"
+    },
+    {
+      "name": "ipAdEntNetMask",
+      "oid": "1.3.6.1.2.1.4.20.1.3",
+      "data": "IPv4 subnet mask"
+    },
+    {
+      "name": "ipv6AddrPfxLength",
+      "oid": "1.3.6.1.2.1.55.1.8.1.2",
+      "data": "IPv6 prefix length"
+    },
+    {
+      "name": "mplsL3VpnVrfDescription",
+      "oid": "1.3.6.1.2.1.10.166.11.1.2.2.1.3",
+      "data": "VRF description"
+    },
+    {
+      "name": "mplsL3VpnVrfRD",
+      "oid": "1.3.6.1.2.1.10.166.11.1.2.2.1.4",
+      "data": "VRF route distinguisher"
+    },
+    {
+      "name": "mplsL3VpnVrfRT",
+      "oid": "1.3.6.1.2.1.10.166.11.1.2.3.1.4",
+      "data": "VRF route target"
+    },
+    {
+      "name": "mplsL3VpnIfVpnClassification",
+      "oid": "1.3.6.1.2.1.10.166.11.1.2.1.1.2",
+      "data": "VPN interface classification"
+    }
+  ],
+  "system": [
+    {
+      "name": "sysDescr",
+      "oid": "1.3.6.1.2.1.1.1.0",
+      "data": "Hardware and software description"
+    },
+    {
+      "name": "sysObjectID",
+      "oid": "1.3.6.1.2.1.1.2.0",
+      "data": "Vendor-assigned system identifier"
+    },
+    {
+      "name": "sysContact",
+      "oid": "1.3.6.1.2.1.1.4.0",
+      "data": "Administrative contact"
+    },
+    {
+      "name": "sysName",
+      "oid": "1.3.6.1.2.1.1.5.0",
+      "data": "System name"
+    },
+    {
+      "name": "sysLocation",
+      "oid": "1.3.6.1.2.1.1.6.0",
+      "data": "System location"
+    },
+    {
+      "name": "sysServices",
+      "oid": "1.3.6.1.2.1.1.7.0",
+      "data": "Supported service-layer bitmap"
+    }
+  ],
+  "lldp": [
+    {
+      "name": "lldpLocPortIdSubtype",
+      "oid": "1.0.8802.1.1.2.1.3.7.1.2",
+      "data": "Local port identifier type"
+    },
+    {
+      "name": "lldpLocPortId",
+      "oid": "1.0.8802.1.1.2.1.3.7.1.3",
+      "data": "Local port identifier"
+    },
+    {
+      "name": "lldpLocPortDesc",
+      "oid": "1.0.8802.1.1.2.1.3.7.1.4",
+      "data": "Local port description"
+    },
+    {
+      "name": "lldpRemPortIdSubtype",
+      "oid": "1.0.8802.1.1.2.1.4.1.1.6",
+      "data": "Remote port identifier type"
+    },
+    {
+      "name": "lldpRemPortId",
+      "oid": "1.0.8802.1.1.2.1.4.1.1.7",
+      "data": "Remote port identifier"
+    },
+    {
+      "name": "lldpRemPortDesc",
+      "kentik_documentation_name": "lldpRemPortIdDesc",
+      "oid": "1.0.8802.1.1.2.1.4.1.1.8",
+      "data": "Remote port description"
+    },
+    {
+      "name": "lldpRemSysName",
+      "oid": "1.0.8802.1.1.2.1.4.1.1.9",
+      "data": "Remote system name"
+    },
+    {
+      "name": "dot1dBasePortIfIndex",
+      "oid": "1.3.6.1.2.1.17.1.4.1.2",
+      "data": "Bridge port to interface index mapping"
+    }
+  ],
+  "vendor_specific": [
+    {
+      "vendors": ["Arista", "Palo Alto Networks"],
+      "objects": [
+        {
+          "name": "hrStorageTable",
+          "oid": "1.3.6.1.2.1.25.2.3",
+          "kind": "table",
+          "data": "Memory utilization and component identification"
+        },
+        {
+          "name": "hrDeviceTable",
+          "oid": "1.3.6.1.2.1.25.3.2",
+          "kind": "table",
+          "data": "CPU component identification"
+        },
+        {
+          "name": "hrProcessorTable",
+          "oid": "1.3.6.1.2.1.25.3.3",
+          "kind": "table",
+          "data": "CPU utilization"
+        }
+      ]
+    },
+    {
+      "vendors": ["Cisco"],
+      "objects": [
+        {
+          "name": "entPhysicalName",
+          "oid": "1.3.6.1.2.1.47.1.1.1.1.7",
+          "kind": "column",
+          "data": "Physical component name"
+        },
+        {
+          "name": "cpmCPUTotalTable",
+          "oid": "1.3.6.1.4.1.9.9.109.1.1.1",
+          "kind": "table",
+          "data": "CPU utilization"
+        },
+        {
+          "name": "ciscoMemoryPoolTable",
+          "oid": "1.3.6.1.4.1.9.9.48.1.1",
+          "kind": "table",
+          "data": "Memory pool utilization"
+        }
+      ]
+    },
+    {
+      "vendors": ["F5 BIG-IP"],
+      "objects": [
+        {
+          "name": "sysGlobalHostMemTotal",
+          "oid": "1.3.6.1.4.1.3375.2.1.1.2.20.2",
+          "data": "Total host memory",
+          "component": "Global"
+        },
+        {
+          "name": "sysGlobalHostMemUsed",
+          "oid": "1.3.6.1.4.1.3375.2.1.1.2.20.3",
+          "data": "Used host memory",
+          "component": "Global"
+        },
+        {
+          "name": "sysGlobalHostCpuUsageRatio5m",
+          "oid": "1.3.6.1.4.1.3375.2.1.1.2.20.37",
+          "data": "Five-minute CPU usage ratio",
+          "component": "Global"
+        },
+        {
+          "name": "sysStatMemoryTotal",
+          "oid": "1.3.6.1.4.1.3375.2.1.1.2.1.44",
+          "data": "Total TMM memory",
+          "component": "TMM"
+        },
+        {
+          "name": "sysStatMemoryUsed",
+          "oid": "1.3.6.1.4.1.3375.2.1.1.2.1.45",
+          "data": "Used TMM memory",
+          "component": "TMM"
+        },
+        {
+          "name": "sysGlobalHostOtherMemoryTotal",
+          "oid": "1.3.6.1.4.1.3375.2.1.1.2.20.44",
+          "data": "Total non-TMM memory",
+          "component": "Other"
+        },
+        {
+          "name": "sysGlobalHostOtherMemoryUsed",
+          "oid": "1.3.6.1.4.1.3375.2.1.1.2.20.45",
+          "data": "Used non-TMM memory",
+          "component": "Other"
+        },
+        {
+          "name": "sysGlobalHostSwapTotal",
+          "oid": "1.3.6.1.4.1.3375.2.1.1.2.20.46",
+          "data": "Total swap",
+          "component": "Swap"
+        },
+        {
+          "name": "sysGlobalHostSwapUsed",
+          "oid": "1.3.6.1.4.1.3375.2.1.1.2.20.47",
+          "data": "Used swap",
+          "component": "Swap"
+        }
+      ]
+    },
+    {
+      "vendors": ["Huawei"],
+      "objects": [
+        {
+          "name": "hwifNet32BitIndex",
+          "oid": "1.3.6.1.4.1.2011.5.25.110.1.2.1.2",
+          "data": "NetStream interface index mapping"
+        },
+        {
+          "name": "hwEntityCpuUsage",
+          "oid": "1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5",
+          "data": "Component CPU utilization"
+        },
+        {
+          "name": "hwEntityMemUsage",
+          "oid": "1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7",
+          "data": "Component memory utilization"
+        },
+        {
+          "name": "hwEntityUpTime",
+          "oid": "1.3.6.1.4.1.2011.5.25.31.1.1.1.1.10",
+          "data": "Component uptime"
+        }
+      ]
+    },
+    {
+      "vendors": ["Juniper"],
+      "objects": [
+        {
+          "name": "jnxOperatingTable",
+          "oid": "1.3.6.1.4.1.2636.3.1.13",
+          "kind": "table",
+          "data": "CPU utilization, memory utilization, and component identification",
+          "columns": {
+            "5": "jnxOperatingDescr",
+            "6": "jnxOperatingState",
+            "7": "jnxOperatingTemp",
+            "8": "jnxOperatingCPU",
+            "11": "jnxOperatingBuffer",
+            "13": "jnxOperatingUpTime"
+          }
+        }
+      ]
+    },
+    {
+      "vendors": ["Nokia"],
+      "objects": [
+        {
+          "name": "vRtrIfName",
+          "oid": "1.3.6.1.4.1.6527.3.1.2.3.4.1.4",
+          "data": "Virtual router interface name"
+        },
+        {
+          "name": "vRtrIfDescription",
+          "oid": "1.3.6.1.4.1.6527.3.1.2.3.4.1.34",
+          "data": "Virtual router interface description"
+        },
+        {
+          "name": "vRtrIfGlobalIndex",
+          "oid": "1.3.6.1.4.1.6527.3.1.2.3.4.1.63",
+          "data": "System-wide virtual router interface index"
+        }
+      ]
+    }
+  ]
+}
